@@ -87,7 +87,8 @@
 
 .chatArea {
   // height: 100%;
-  padding-bottom: 20px;
+  position: relative;
+  margin-bottom: 90px;
 }
 
 .messages {
@@ -110,7 +111,15 @@
 }
 
 /* Input */
-
+.status {
+  bottom: 60px;
+  right: 0;
+  outline: none;
+  padding-left: 10px;
+  position: fixed;
+  width: 100%;
+  color: grey;
+}
 .inputMessage {
   border: 2px solid #000;
   height: 60px;
@@ -118,6 +127,7 @@
   right: 0;
   left: 0;
   outline: none;
+  margin-top: 20px;
   padding-left: 10px;
   position: fixed;
   right: 0;

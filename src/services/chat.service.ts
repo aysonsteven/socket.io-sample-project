@@ -3,15 +3,11 @@ import { Observable } from 'rxjs/Observable';
 import * as io from 'socket.io-client';
 
 export class ChatService {
-  private url = 'http://172.20.10.5:5000';  
+  private url = 'http://localhost:5000';  
   private socket = io(this.url);
   FADE_TIME = 150; // ms
-  TYPING_TIMER_LENGTH = 400; // ms
-  COLORS = [
-    '#e21400', '#91580f', '#f8a700', '#f78b00',
-    '#58dc00', '#287b00', '#a8f07a', '#4ae8c4',
-    '#3b88eb', '#3824aa', '#a700ff', '#d300e7'
-  ];
+  TYPING_TIMER_LENGTH = 1300; // ms
+
 
   window = (window);
   usernameInput = ('.usernameInput'); // Input for username
@@ -24,16 +20,20 @@ export class ChatService {
   // Prompt for setting a username
   username;
   connected = false;
-  typing = false;
+  public typing = false;
   lastTypingTime;
   currentInput: any;
+  participant: string;
 
   addParticipantsMessage (data) {
     let message: string = '';
-    if ( data.numUsers === 1) message += "There's 1 participant";
+    if( ! data.numUsers ) return;
+    if ( data.numUsers == 1) message += "There's 1 participant";
     else message += `There are ${data.numUsers} participants`;
 
     if( message) console.log( message );
+
+    this.participant = message;
      
   }
 
@@ -97,14 +97,15 @@ export class ChatService {
   setTyping() {
     if( this.connected && !this.typing  ){
       this.typing = true;
-      this.socket.emit('typing');
+      this.socket.emit('typing', this.username);
       this.lastTypingTime = (new Date()).getTime();
-
+      
       setTimeout( () => {
         let typingTimer = (new Date()).getTime();
         let timeDiff = typingTimer - this.lastTypingTime;
         if( timeDiff >= this.TYPING_TIMER_LENGTH && this.typing ){
           this.socket.emit('stop typing');
+          
           this.typing = false;
         }
       }, this.TYPING_TIMER_LENGTH);

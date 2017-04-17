@@ -11,10 +11,12 @@ import { ChatService } from './../../services/chat.service';
 export class ChatPage implements OnInit, OnDestroy {
   messages = [];
   connection;
-  message;
+  message: string;
   joined;
   left;
   typing;
+  status;
+  inputct: number = 0;
 
 
 
@@ -35,6 +37,7 @@ export class ChatPage implements OnInit, OnDestroy {
 
     this.joined = this.chatSrvc.getUserjoined().subscribe( join =>{
       console.log( `${join['username']} joined the room` );
+      if ( this.chatSrvc.participant ) console.log( 'from service var', this.chatSrvc.participant );
     })
 
     this.left = this.chatSrvc.userLeft().subscribe( left =>{
@@ -42,8 +45,10 @@ export class ChatPage implements OnInit, OnDestroy {
     })
 
     this.typing = this.chatSrvc.getTyping().subscribe( ontyping =>{
-      console.log('typing', ontyping );
+      if( ontyping['status'] )this.status = `${ontyping['username']} is typing...`;
+      else this.status = '';
     })
+    
     
   }
   
@@ -52,11 +57,16 @@ export class ChatPage implements OnInit, OnDestroy {
   }
 
   onEnter( event ) {
+    
     if( event.keyCode == 13 ){
-       this.sendMessage();
-    console.log( this.messages)
+      if( ! this.message ) return;
+      this.sendMessage();
+      console.log( this.messages)
     }
-    this.chatSrvc.setTyping();
+    console.log( event );
+    if( this.message.length > this.inputct ) this.chatSrvc.setTyping(); 
+
+    this.inputct = this.message.length;
   }
 
 }
